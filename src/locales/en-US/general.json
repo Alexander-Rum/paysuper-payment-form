@@ -11,20 +11,20 @@
   "product": "Product",
   "commission": "Commission",
   "vat": "VAT",
-  "summ": "Summ",
+  "summ": "Sum",
   "ActionProcessing": {
     "title": "You will now be redirected<br>to the bank site for passing 3d security",
     "description": [
       "After passing the 3d security, ",
       "the status of receiving money may <br>come with a delay, ",
-      "it depends directly on the bank in which you pay"
+      "it depends directly on the bank you use to pay"
     ]
   },
   "ActionResult": {
     "noMoneyError": {
       "title": "Declined",
       "subtitle": "You haven’t enough money",
-      "description": "Please go back<br>and try other pay method"
+      "description": "Please go back<br>and try another payment method"
     },
     "unknownError": {
       "title": "Bad luck",
@@ -38,8 +38,8 @@
     "success": {
       "title": "Let's play!",
       "titleSubSlave": "Your transaction ID is",
-      "descriptionSlaveInitial": "Leave your email to recieve the bill",
-      "descriptionSlaveFinal": "We sent payment bill to",
+      "descriptionSlaveInitial": "Leave your email to get the receipt",
+      "descriptionSlaveFinal": "We sent payment receipt to",
       "email": "Email"
     }
   },
@@ -67,7 +67,7 @@
     "expiryDate": "Expiry date",
     "expiryDateInvalid": "Expiry date is invalid",
     "cvv": "CVC/CVV",
-    "cardholder": "Cardholder name",
+    "cardholder": "Cardholder's name",
     "email": "Email to receive the purchase",
     "emailInvalid": "Email is invalid",
     "remember": "Remember me",
@@ -92,11 +92,11 @@
     "remember": "Remember me",
     "rememberInfo": "Security of billing data storage is provided in accordance with the requirements of the PCI DSS standard, using 3D Secure and SSL protocols",
     "city": "City",
-    "cityInvalid": "Неверный город",
+    "cityInvalid": "Wrong city",
     "country": "Country",
-    "countryInvalid": "Choose the country",
+    "countryInvalid": "Choose your country",
     "zip": "ZIP code",
-    "zipInvalid": "Неверный почтовый индекс"
+    "zipInvalid": "Wrong ZIP code"
   },
   "LayoutFooter": {
     "userAgreement": "User Agreement",
@@ -126,7 +126,7 @@
     "oops": "Oooops",
     "cantAcceptPayments": "We cannot accept payments in your area.<br>",
     "chooseAnotherArea": "Wrong area? Choose the right one",
-    "country": "Select the country"
+    "country": "Select another country"
   },
   "UiCardField": {
     "cardNumber": "Card number"

@@ -13,7 +13,7 @@
   "vat": "НДС",
   "summ": "Сумма",
   "ActionProcessing": {
-    "title": "Вы будете переадресованы на сайт <br>банка для прохождения 3d security",
+    "title": "Вы будете перенаправлены на сайт <br>банка для прохождения 3d security",
     "description": [
       "После прохождения 3d security. Информация <br>",
       "о поступлении денег может прийти с задержкой. <br>",
@@ -36,9 +36,9 @@
       "subtitle": "Произошла ошибка"
     },
     "success": {
-      "title": "Погнали!",
+      "title": "Поехали!",
       "titleSubSlave": "ID вашего платежа:",
-      "descriptionSlaveInitial": "Введите email, чтобы получить счёт",
+      "descriptionSlaveInitial": "Введите ваш email, чтобы получить счёт",
       "descriptionSlaveFinal": "Мы выслали чек на",
       "email": "Email"
     }
@@ -113,7 +113,7 @@
     "refundAdditionalInfo": "Вы можете вернуть эту игру в течении 10 дней"
   },
   "PaymentAreaWarning": {
-    "oops": "Оооопаньки",
+    "oops": "Опаньки",
     "cantAcceptPayments": "Мы не можем принимать платежи в вашей стране. ",
     "chooseAnotherArea": "Мы ошиблись?",
     "country": "Выберите страну"
@@ -126,7 +126,6 @@
     "paymentManagement": "Управление платежами",
     "userAgreement": "Пользовательское соглашение",
     "refundPolicy": "Политика возврата",
-    "refundAdditionalInfo": "Вы можете вернуть эту игру в течении 10 дней"
   },
   "UiCardField": {
     "cardNumber": "Номер карты"

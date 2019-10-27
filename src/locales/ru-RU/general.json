@@ -17,7 +17,7 @@
     "description": [
       "После прохождения 3d security. Информация <br>",
       "о поступлении денег может прийти с задержкой. <br>",
-      "Всё зависит от банка, через который проходит оплата."
+      "Это зависит от банка, через который проходит оплата."
     ]
   },
   "ActionResult": {
@@ -38,7 +38,7 @@
     "success": {
       "title": "Поехали!",
       "titleSubSlave": "ID вашего платежа:",
-      "descriptionSlaveInitial": "Введите ваш email, чтобы получить счёт",
+      "descriptionSlaveInitial": "Введите ваш email, чтобы получить платежный чек",
       "descriptionSlaveFinal": "Мы выслали чек на",
       "email": "Email"
     }
@@ -110,7 +110,7 @@
     "paymentManagement": "Управление платежами",
     "userAgreement": "Пользовательское соглашение",
     "refundPolicy": "Политика возврата",
-    "refundAdditionalInfo": "Вы можете вернуть эту игру в течении 10 дней"
+    "refundAdditionalInfo": "Вы можете вернуть эту игру в течение 10 дней"
   },
   "PaymentAreaWarning": {
     "oops": "Опаньки",
@@ -126,7 +126,7 @@
     "paymentManagement": "Управление платежами",
     "userAgreement": "Пользовательское соглашение",
     "refundPolicy": "Политика возврата",
-    "refundAdditionalInfo": "Вы можете вернуть эту игру в течении 10 дней"
+    "refundAdditionalInfo": "Вы можете вернуть эту игру в течение 10 дней"
   },
   "UiCardField": {
     "cardNumber": "Номер карты"

@@ -39,7 +39,7 @@
       "title": "Let's play!",
       "titleSubSlave": "Your transaction ID is",
       "descriptionSlaveInitial": "Leave your email to get the receipt",
-      "descriptionSlaveFinal": "We sent payment receipt to",
+      "descriptionSlaveFinal": "We sent your payment receipt to",
       "email": "Email"
     }
   },

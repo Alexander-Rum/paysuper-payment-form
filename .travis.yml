@@ -18,7 +18,7 @@ before_script: curl https://rclone.org/install.sh | sudo bash
 jobs:
   include:
   - name: dev
-    if: "(branch = dev)"
+    if: "(branch = master)"
     script:
     - set -e
     - yarn lint
@@ -31,12 +31,12 @@ jobs:
     #- yarn coverage:publish
     - sonar-scanner
   - name: release
-    if: "(branch = master) and (tag =~ ^v)"
+    if: "(tag =~ ^v)"
     script:
     - set -e
     - yarn lint
     - yarn test
-    - yarn build --frozen-lockfile
+    - yarn build-release --frozen-lockfile
     - rclone copy dist :s3://paysuper/form/latest/ --s3-access-key-id=$S3_ACCESS_KEY --s3-secret-access-key=$S3_SECRET_KEY --s3-endpoint=$S3_HOST
     - rclone copy dist :s3://paysuper/form/$TRAVIS_TAG/ --s3-access-key-id=$S3_ACCESS_KEY --s3-secret-access-key=$S3_SECRET_KEY --s3-endpoint=$S3_HOST
     - rclone copy dist :s3://cdn.pay.super.com/payform/latest/ --s3-access-key-id=$AWS_CDN_ACCESS_KEY_ID --s3-secret-access-key=$AWS_CDN_SECRET_KEY --s3-region=eu-west-1

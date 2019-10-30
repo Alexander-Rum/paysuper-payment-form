@@ -1,3 +1,4 @@
+const path = require('path');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 module.exports = {
@@ -41,6 +42,12 @@ module.exports = {
   },
 
   configureWebpack: {
+    entry: [
+      'core-js/modules/es.promise',
+      'core-js/modules/es.string.includes',
+      'core-js/modules/es.array.iterator',
+      path.resolve(__dirname, 'src/main.js'),
+    ],
     output: {
       filename: 'paysuper-form.js',
       chunkFilename: '[name].js',
@@ -50,6 +57,8 @@ module.exports = {
         ? [new BundleAnalyzerPlugin()]
         : [],
   },
+
+  transpileDependencies: ['vue-sticky-directive'],
 
   pluginOptions: {
     lintStyleOnBuild: false,

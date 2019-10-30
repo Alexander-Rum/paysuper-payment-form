@@ -19,28 +19,24 @@ export default {
   data() {
     return {
       isProfileShown: false,
-      isTermsShown: false,
     };
   },
-  mounted() {
+  created() {
     this.$addCssRules({
       [`.${this.$style.layout}`]: {
         'background-color': this.$gui.cartBackgroundColor,
       },
       [`.${this.$style.link}`]: {
-        color: this.$gui.headerTextColor,
+        color: this.$gui.layoutTextColor,
       },
       [`.${this.$style.link}:hover`]: {
-        color: this.$gui.cartHoverTextColor,
+        color: this.$gui.baseHoverColor,
       },
       [`.${this.$style.tipLink}`]: {
-        color: this.$gui.tipHeaderColor,
+        color: this.$gui.tipLinkColor,
       },
       [`.${this.$style.tipLink}:hover`]: {
-        color: this.$gui.tipLinkHoverColor,
-      },
-      [`.${this.$style.tipContent}`]: {
-        color: this.$gui.tipContentColor,
+        color: this.$gui.baseHoverColor,
       },
       [`.${this.$style.header}`]: {
         'background-image': `
@@ -118,28 +114,8 @@ export default {
       </div>
 
       <div :class="$style.footer">
-        <span
-          :class="$style.link"
-          @mouseenter="isTermsShown = true"
-          @mouseleave="isTermsShown = false"
-        >
+        <span :class="$style.link">
           {{ $t('ModalCart.termsOfUse') }}
-          <UiTip
-            width="240px"
-            :visible="isTermsShown"
-          >
-            <a
-              href="#"
-              :class="$style.tipLink"
-              @click="fireAnalyticsEvent('UserAgreement')"
-            >{{ $t('ModalCart.userAgreement') }}</a>
-            <a
-              href="#"
-              :class="$style.tipLink"
-              @click="fireAnalyticsEvent('RefundPolicy')"
-            >{{ $t('ModalCart.refundPolicy') }}</a>
-            <span :class="$style.tipContent">{{ $t('ModalCart.refundAdditionalInfo') }}</span>
-          </UiTip>
         </span>
         <a
           href="#"
@@ -201,13 +177,6 @@ export default {
   &:hover {
     text-decoration: none;
   }
-}
-.tipContent {
-  display: block;
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 18px;
-  margin-top: 12px;
 }
 .content {
   display: flex;

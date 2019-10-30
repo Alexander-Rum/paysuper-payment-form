@@ -14,6 +14,11 @@ export default {
       },
     },
 
+    isModal: {
+      type: Boolean,
+      default: false,
+    },
+
     message: {
       type: String,
     },
@@ -23,10 +28,16 @@ export default {
     IconTotemFail,
   },
 
-  mounted() {
+  created() {
     this.$addCssRules({
       [`.${this.$style.orderCreationError}`]: {
         'background-color': this.$gui.cartBackgroundColor,
+      },
+      [`.${this.$style.titleMain}`]: {
+        color: this.$gui.warningTitleColor,
+      },
+      [`.${this.$style.description}`]: {
+        color: this.$gui.warningTextColor,
       },
     });
   },
@@ -54,11 +65,21 @@ export default {
       </div>
     </div>
     <div :class="$style.footer">
-       <UiButton
+      <UiButton
         :class="$style.button"
         :hasBorderRadius="false"
         @click="$emit('tryAgain')"
-       >{{$t('OrderCreationError.tryAgain')}}</UiButton>
+      >
+        {{$t('OrderCreationError.tryAgain')}}
+      </UiButton>
+    </div>
+
+    <div
+      v-if="isModal"
+      :class="$style.close"
+      @click="$emit('close')"
+    >
+      <IconClose :class="$style.iconClose" />
     </div>
   </div>
 </UiTransitionFade>
@@ -74,15 +95,16 @@ export default {
   height: 100%;
   width: 100%;
   position: relative;
-  z-index: 1000;
+  z-index: 100;
 
   &._layout-page {
   }
 }
 
 .content {
-  padding: 10px 40px 40px;
-  width: 650px;
+  padding: 10px 40px 10px;
+  width: 100%;
+  max-width: 650px;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -94,7 +116,6 @@ export default {
 }
 
 .titleMain {
-  color: #fff;
   font-weight: bold;
   font-size: 25px;
   line-height: 31px;
@@ -102,7 +123,6 @@ export default {
 }
 
 .description {
-  color: #f3da58;
   font-weight: 500;
   font-size: 15px;
   line-height: 23px;
@@ -114,5 +134,24 @@ export default {
 
 .button {
   width: 100%;
+}
+.close {
+  position: absolute;
+  right: 0;
+  top: 0;
+  cursor: pointer;
+  z-index: 10000;
+  height: 60px;
+  width: 60px;
+  padding: 24px;
+
+  &:hover > .iconClose {
+    transform: rotate(360deg);
+  }
+}
+.iconClose {
+  width: 12px;
+  height: 12px;
+  transition: transform 0.3s ease-out 0.3s;
 }
 </style>

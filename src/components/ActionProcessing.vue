@@ -28,10 +28,16 @@ export default {
     },
   },
 
-  mounted() {
+  created() {
     this.$addCssRules({
       [`.${this.$style.actionProcessing}:before`]: {
         'background-color': this.$gui.cartBackgroundColor,
+      },
+      [`.${this.$style.titleMain}`]: {
+        color: this.$gui.processTitleColor,
+      },
+      [`.${this.$style.description}`]: {
+        color: this.$gui.processTextColor,
       },
     });
   },
@@ -94,7 +100,7 @@ export default {
   right: 0;
   top: 0;
   bottom: 0;
-  z-index: 100;
+  z-index: 1000;
 
   &:before {
     content: '';
@@ -119,7 +125,6 @@ export default {
 }
 
 .titleMain {
-  color: #fff;
   font-weight: bold;
   font-size: 25px;
   line-height: 31px;
@@ -127,7 +132,6 @@ export default {
 }
 
 .description {
-  color: #fff;
   font-weight: 500;
   font-size: 15px;
   line-height: 23px;

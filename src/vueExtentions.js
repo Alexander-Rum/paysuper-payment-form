@@ -16,17 +16,23 @@ function objectToCss(obj) {
 }
 
 function $addCssRules(rules) {
+  let styles = '';
+  const styleElement = document.createElement('style');
+  styleElement.type = 'text/css';
+
   forEach(rules, (rule, selector) => {
     if (!isEmpty(rule)) {
       const css = objectToCss(rule);
-      const styleElement = document.createElement('style');
-
-      styleElement.type = 'text/css';
-      styleElement.innerHTML = `${selector} {${css}}`;
-      styleElement.appendChild(document.createTextNode(''));
-
-      document.head.appendChild(styleElement);
+      styles += `${selector}{${css}}`;
     }
+  });
+
+  styleElement.innerHTML = styles;
+  styleElement.appendChild(document.createTextNode(''));
+  document.head.appendChild(styleElement);
+
+  this.$on('hook:destroyed', () => {
+    styleElement.parentNode.removeChild(styleElement);
   });
 }
 

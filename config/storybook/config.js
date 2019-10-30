@@ -53,11 +53,18 @@ addDecorator(() => ({
     const styleElement = document.createElement('style');
     styleElement.type = 'text/css';
     styleElement.innerHTML = `
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
       .wawa {
         display: inline !important;
         border: 0;
         border-left-width: 1px;
         border-style: solid;
+      }
+      * {
+        box-sizing: border-box;
       }
     `;
     styleElement.appendChild(document.createTextNode(''));

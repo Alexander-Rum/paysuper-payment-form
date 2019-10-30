@@ -9,17 +9,42 @@ export default {
     settings: {
       type: Object,
     },
+    isUpdateOnClick: {
+      default: false,
+      type: Boolean,
+    },
   },
   data() {
     return {
       innerSettings: { ...this.settings },
     };
   },
+  created() {
+    this.$addCssRules({
+      '.ui-scrollbar-box > .ps__scrollbar-y-rail > .ps__scrollbar-y::before': {
+        'background-color': this.$gui.scrollbarColor,
+      },
+    });
+  },
   mounted() {
     this.innerSettings = {
       ...this.innerSettings,
       swicher: false,
     };
+
+    if (this.isUpdateOnClick) {
+      window.addEventListener('click', this.update);
+    }
+  },
+  beforeDestroy() {
+    window.removeEventListener('click', this.update);
+  },
+  methods: {
+    update() {
+      this.$nextTick(() => {
+        this.$refs.scrollbar.update();
+      });
+    },
   },
 };
 </script>
@@ -27,6 +52,7 @@ export default {
 <template>
 <VuePerfectScrollbar
   class="ui-scrollbar-box"
+  ref="scrollbar"
   :settings="innerSettings"
 >
   <slot></slot>
@@ -35,25 +61,31 @@ export default {
 
 <style lang="scss">
 .ui-scrollbar-box {
-  &.ps:hover > .ps__scrollbar-y-rail:hover,
-  &.ps:hover.ps--in-scrolling.ps--y > .ps__scrollbar-y-rail,
-  &.ps.ps--in-scrolling.ps--y > .ps__scrollbar-y-rail {
-    background-color: transparent;
+  & > .ps__scrollbar-y-rail > .ps__scrollbar-y {
+    background-color: transparent !important;
+    right: 1px !important;
+    width: 100%;
 
-    & > .ps__scrollbar-y {
+    &::before {
+      content: '';
       width: 3px;
-      background-color: rgba(0, 0, 0, 0.7);
+      position: absolute;
+      right: 4px;
+      top: 0;
+      bottom: 0;
+      border-radius: 4px;
     }
   }
 
-  &.ps > .ps__scrollbar-y-rail > .ps__scrollbar-y {
-    background-color: rgba(0, 0, 0, 0.7);
-    width: 3px;
-    right: 5px;
-    border-radius: 4px;
+  &.ps > .ps__scrollbar-y-rail {
+    cursor: pointer;
+    opacity: 0;
   }
 
-  &.ps > .ps__scrollbar-y-rail {
+  &.ps:hover > .ps__scrollbar-y-rail,
+  &.ps:hover.ps--in-scrolling.ps--y > .ps__scrollbar-y-rail,
+  &.ps.ps--in-scrolling.ps--y > .ps__scrollbar-y-rail {
+    background-color: transparent;
     opacity: 0.6;
   }
 }

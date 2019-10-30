@@ -30,7 +30,7 @@ export default {
     },
   },
 
-  mounted() {
+  created() {
     this.$addCssRules({
       [`.${this.$style.left}`]: {
         'background-color': this.$gui.cartBackgroundColor,
@@ -47,6 +47,12 @@ export default {
         .${this.$style.stub}:after
       `]: {
         'background-color': this.$gui.stubContentColorSecondary,
+      },
+      [`.${this.$style.link}`]: {
+        color: this.$gui.layoutTextColor,
+      },
+      [`.${this.$style.link}:hover`]: {
+        color: this.$gui.baseHoverColor,
       },
     });
   },
@@ -112,13 +118,8 @@ export default {
 .link {
   font-size: 12px;
   font-weight: 500;
-  color: #71757a;
   text-decoration: none;
   padding: 8px 0;
-
-  &:hover {
-    color: #00d697;
-  }
 
   &:not(:last-child) {
     margin-right: 5vw;

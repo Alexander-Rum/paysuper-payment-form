@@ -1,6 +1,6 @@
 <template>
 <svg width="77" height="52" viewBox="0 0 77 52" fill="none">
-  <rect width="77" height="51.3333" rx="6" fill="#06EAA7"/>
+  <rect width="77" height="51.3333" rx="6" :fill="$gui.iconPositiveColor"/>
   <rect y="7.33331" width="77" height="14.6667" fill="black"/>
   <rect x="10" y="27" width="57" height="10" rx="2" fill="white"/>
   <path

@@ -12,7 +12,7 @@ export default {
   props: {
     content: {
       type: String,
-      default: 'card',
+      default: 'restricted',
       validator(value) {
         return includes(['select-location', 'restricted'], value);
       },
@@ -28,6 +28,17 @@ export default {
     return {
       country: '',
     };
+  },
+
+  created() {
+    this.$addCssRules({
+      [`.${this.$style.titleMain}`]: {
+        color: this.$gui.warningTitleColor,
+      },
+      [`.${this.$style.titleSub}`]: {
+        color: this.$gui.warningTextColor,
+      },
+    });
   },
 };
 </script>
@@ -69,7 +80,6 @@ export default {
 }
 
 .titleMain {
-  color: #fff;
   font-weight: bold;
   font-size: 25px;
   line-height: 31px;
@@ -78,7 +88,6 @@ export default {
 }
 
 .titleSub {
-  color: #f3da58;
   font-weight: 500;
   font-size: 12px;
   line-height: 18px;
@@ -90,20 +99,5 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.code {
-  font-weight: bold;
-  font-size: 18px;
-  line-height: 22px;
-  color: #06eaa7;
-}
-
-.email {
-  font-weight: bold;
-  font-size: 15px;
-  line-height: 19px;
-  color: #ffffff;
-  margin-top: 8px;
 }
 </style>

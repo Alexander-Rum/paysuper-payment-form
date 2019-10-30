@@ -68,6 +68,9 @@ export default {
       [`.${this.before}`]: {
         color: this.$gui.buttonBeforeColor,
       },
+      [`.${this.before} > svg`]: {
+        fill: this.$gui.buttonBeforeColor,
+      },
       [`.${this.after}`]: {
         color: this.$gui.buttonAfterColor,
       },
@@ -89,19 +92,13 @@ export default {
 <style module lang="scss">
 $after-margin: 12px;
 $before-margin: 12px;
-$after-text-color: #fff;
-$before-text-color: #fff;
-$box-color: #5b88de;
 $font-size: 20px;
 $font-weight: 700;
 $height: 70px;
 $padding: 0 24px;
-$text-color: #fff;
 $align: center;
 $border-width: 0;
 $border-color: transparent;
-$hover-box-color: lighten($box-color, 3%);
-$active-box-color: darken($box-color, 3%);
 $disabled-opacity: 0.7;
 $border-radius: 12px;
 $transition: background-color 0.2s ease-out, color 0.2s ease-out;
@@ -111,28 +108,18 @@ $transition: background-color 0.2s ease-out, color 0.2s ease-out;
   outline-width: 0;
   position: relative;
   display: inline-flex;
-  background-color: $box-color;
   font-family: inherit;
   font-size: $font-size;
   font-weight: $font-weight;
   height: $height;
   padding: $padding;
-  color: $text-color;
   align-items: center;
   justify-content: $align;
   border-width: $border-width;
-  border-color: $border-color;
   transition: $transition;
   vertical-align: top;
   white-space: nowrap;
-
-  &:hover {
-    background-color: $hover-box-color;
-  }
-
-  &:active {
-    background-color: $active-box-color;
-  }
+  text-align: center;
 
   &._hasRadius {
     border-radius: $border-radius;

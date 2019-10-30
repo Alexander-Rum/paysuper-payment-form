@@ -39,6 +39,19 @@ export default {
       type: String,
     },
 
+    orderType: {
+      required: true,
+      type: String,
+      validator(value) {
+        return includes(['key', 'product', 'simple', 'virtual_currency', 'virtual_items'], value);
+      },
+    },
+
+    platformInstructionLink: {
+      default: '',
+      type: String,
+    },
+
     email: {
       required: true,
       type: String,
@@ -71,8 +84,12 @@ export default {
         },
         success: {
           title: this.$t('ActionResult.success.title'),
-          titleSubSlave: this.$t('ActionResult.success.titleSubSlave'),
-          descriptionSlaveFinal: this.$t('ActionResult.success.descriptionSlaveFinal'),
+          titleSubSlave: this.$t(`ActionResult.success.titleSubSlave.${this.orderType}`, {
+            link: this.platformInstructionLink,
+          }),
+          descriptionSlaveFinal: this.$t(
+            `ActionResult.success.descriptionSlaveFinal.${this.orderType}`,
+          ),
           descriptionSlaveInitial: this.$t('ActionResult.success.descriptionSlaveInitial'),
           email: this.$t('ActionResult.success.email'),
           iconComponent: 'IconTotemSuccess',
@@ -80,6 +97,28 @@ export default {
         },
       };
     },
+  },
+  created() {
+    this.$addCssRules({
+      [`.${this.$style.titleMain}`]: {
+        color: this.$gui.resultTitleColor,
+      },
+      [`.${this.$style.titleSub}`]: {
+        color: this.$gui.resultSubtitleColor,
+      },
+      [`.${this.$style.description}`]: {
+        color: this.$gui.resultTextColor,
+      },
+      [`.${this.$style.titleSubSlave}, .${this.$style.descriptionSlave}`]: {
+        color: this.$gui.resultSubtextColor,
+      },
+      [`.${this.$style.code}`]: {
+        color: this.$gui.resultCodeColor,
+      },
+      [`.${this.$style.email}`]: {
+        color: this.$gui.resultEmailColor,
+      },
+    });
   },
 };
 </script>
@@ -89,10 +128,11 @@ export default {
     <div>
       <h2 :class="$style.titleMain">{{types[type].title}}</h2>
       <div v-if="type === 'success'">
-        <p :class="$style.titleSubSlave">
-          {{types[type].titleSubSlave}}
+        <p
+          :class="$style.titleSubSlave"
+          v-html="types[type].titleSubSlave"
+        >
         </p>
-        <p :class="$style.code">{{orderId}}</p>
       </div>
       <p
         :class="$style.titleSub"
@@ -142,7 +182,6 @@ export default {
 }
 
 .titleMain {
-  color: #fff;
   font-weight: bold;
   font-size: 25px;
   line-height: 31px;
@@ -150,14 +189,12 @@ export default {
 }
 
 .titleSub {
-  color: #fff;
   font-weight: 500;
   font-size: 15px;
   line-height: 23px;
 }
 
 .titleSubSlave {
-  color: darken(#fff, 30%);
   font-weight: 500;
   font-size: 12px;
   line-height: 18px;
@@ -185,19 +222,16 @@ export default {
   font-weight: bold;
   font-size: 12px;
   line-height: 22px;
-  color: #06eaa7;
   margin: 0 -20px;
 }
 
 .description {
-  color: #fff;
   font-weight: 500;
   font-size: 15px;
   line-height: 23px;
 }
 
 .descriptionSlave {
-  color: darken(#fff, 30%);
   font-weight: 500;
   font-size: 12px;
   line-height: 18px;
@@ -207,7 +241,6 @@ export default {
   font-weight: bold;
   font-size: 15px;
   line-height: 19px;
-  color: #ffffff;
   margin-top: 8px;
 }
 

@@ -3,11 +3,15 @@ import StubPreloaderForm from '@/components/StubPreloaderForm.vue';
 
 export default {
   name: 'StubPreloaderFormModal',
-
+  props: {
+    isVerticalModal: {
+      default: false,
+      type: Boolean,
+    },
+  },
   components: {
     StubPreloaderForm,
   },
-
   mounted() {
     this.$addCssRules({
       [`
@@ -24,10 +28,10 @@ export default {
 
 <template>
 <div :class="$style.stubPreloaderForm">
-  <div :class="$style.formStubHeader">
+  <div v-if="!isVerticalModal" :class="$style.formStubHeader">
     <div></div>
   </div>
-  <StubPreloaderForm />
+  <StubPreloaderForm :isVerticalModal="isVerticalModal" />
 </div>
 </template>
 

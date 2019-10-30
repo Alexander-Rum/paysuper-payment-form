@@ -1,6 +1,6 @@
 <script>
 export default {
-  mounted() {
+  created() {
     this.$addCssRules({
       [`.${this.$style.iconInfo}`]: {
         fill: this.$gui.iconInfoColor,

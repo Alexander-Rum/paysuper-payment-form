@@ -23,12 +23,12 @@ export default new Vuex.Store({
     },
   },
   actions: {
-    async initState({ commit, dispatch }, { orderParams, options }) {
+    async initState({ commit, dispatch }, { orderParams, orderData, options }) {
       commit('apiUrl', options.apiUrl);
 
       await Promise.all([
         dispatch('Dictionaries/initState'),
-        dispatch('PaymentForm/initState', { orderParams, options }),
+        dispatch('PaymentForm/initState', { orderParams, orderData, options }),
       ]);
     },
 

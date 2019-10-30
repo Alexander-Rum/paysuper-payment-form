@@ -1,11 +1,13 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
 import { email, required } from 'vuelidate/lib/validators';
+import Sticky from 'vue-sticky-directive';
 import { includes, get } from 'lodash-es';
 import { gtagEvent } from '@/analytics';
 import ActionResult from '@/components/ActionResult.vue';
 import FormSectionBankCard from '@/components/FormSectionBankCard.vue';
 import PaymentAreaWarning from '@/components/PaymentAreaWarning.vue';
+import geInstructionLinkByPlatform from '@/helpers/geInstructionLinkByPlatform';
 
 function getRegexp(value) {
   return new RegExp(value);
@@ -14,6 +16,8 @@ function getRegexp(value) {
 export default {
   name: 'FormSection',
 
+  directives: { Sticky },
+
   components: {
     ActionResult,
     FormSectionBankCard,
@@ -21,12 +25,13 @@ export default {
   },
 
   props: {
-    layout: {
-      type: String,
-      default: 'modal',
-      validator(value) {
-        return includes(['modal', 'page'], value);
-      },
+    isMobile: {
+      type: Boolean,
+      default: false,
+    },
+    isPageView: {
+      type: Boolean,
+      default: false,
     },
   },
 
@@ -36,11 +41,12 @@ export default {
 
   data() {
     return {
+      footerSticked: false,
+
       paymentData: {
         cardNumber: '',
         expiryDate: '',
         cvv: '',
-        cardHolder: '',
         hasRemembered: false,
         country: '',
         city: '',
@@ -90,6 +96,7 @@ export default {
   computed: {
     ...mapState('PaymentForm', [
       'orderData',
+      'orderParams',
       'activePaymentMethodId',
       'cards',
       'actionResult',
@@ -98,6 +105,7 @@ export default {
       'userIpGeoData',
       'isGeoFieldsExposed',
       'isZipInvalid',
+      'currentPlatformId',
     ]),
     ...mapGetters('PaymentForm', ['activePaymentMethod']),
     ...mapGetters('Dictionaries', ['countries']),
@@ -127,6 +135,24 @@ export default {
       }
 
       return true;
+    },
+
+    isSubmitButtonDisabled() {
+      if (
+        this.isUserCountryConfirmRequested
+        && this.userIpGeoData.country === this.paymentData.country
+      ) {
+        return true;
+      }
+      return false;
+    },
+
+    orderType() {
+      return this.orderParams.type;
+    },
+
+    platformInstructionLink() {
+      return geInstructionLinkByPlatform(this.currentPlatformId);
     },
   },
 
@@ -180,6 +206,9 @@ export default {
       if (this.isUserCountryConfirmRequested) {
         gtagEvent('confirmUserCountry', { event_category: 'userAction' });
         this.submitUserCountry();
+        if (this.$refs.bankCardForm) {
+          this.$refs.bankCardForm.focusCardNumberField();
+        }
       } else if (this.isUserCountryRestricted) {
         gtagEvent('isUserCountryRestricted');
         this.$emit('close');
@@ -256,17 +285,21 @@ export default {
         this.isBankCardNumberChecking = false;
       }
     },
+
+    onStick(event) {
+      this.footerSticked = event.sticked;
+    },
   },
 };
 </script>
 
 <template>
-<div :class="[$style.formSection, $style[`_layout-${layout}`]]">
+<div :class="[$style.formSection, { [$style[`_isPage`]]: isPageView }]">
   <div :class="$style.content">
     <component
-      :is="layout === 'modal' ? 'UiScrollbarBox' : 'div'"
+      :is="isPageView ? 'div' : 'UiScrollbarBox'"
       :class="$style.scrollbox"
-      :settings="layout === 'modal' ? {suppressScrollX: true} : undefined"
+      :settings="isPageView ? undefined : { suppressScrollX: true }"
     >
       <div
         v-show="isPaymentFormVisible"
@@ -284,6 +317,7 @@ export default {
           v-if="isBankCardPayment"
           ref="bankCardForm"
           v-model="paymentData"
+          :isPageView="isPageView"
           :countries="countries"
           :cards="cards"
           :cardNumberValidator="activePaymentMethod.account_regexp | getRegexp"
@@ -321,10 +355,12 @@ export default {
       >
         <ActionResult
           v-if="actionResult"
-          :type="actionResult.type"
+          :email="paymentData.email"
           :message="actionResult.message"
           :orderId="orderData.id"
-          :email="paymentData.email"
+          :orderType="orderType"
+          :type="actionResult.type"
+          :platformInstructionLink="platformInstructionLink"
         />
         <PaymentAreaWarning
           v-if="isUserCountryConfirmRequested || isUserCountryRestricted"
@@ -335,10 +371,16 @@ export default {
       </div>
     </component>
   </div>
-  <div :class="$style.footer">
+  <div
+    v-sticky="isMobile"
+    sticky-side="bottom"
+    on-stick="onStick"
+    :class="[$style.footer, { [$style._sticky]: isMobile && footerSticked }]"
+  >
     <UiButton
       :class="$style.payBtn"
-      :hasBorderRadius="layout === 'page' ? true : false"
+      :hasBorderRadius="isPageView"
+      :disabled="isSubmitButtonDisabled"
       @click="handleMainButtonClick"
     >
       <template v-if="isPaymentFormVisible">
@@ -373,6 +415,7 @@ export default {
   position: relative;
   height: 100%;
   min-height: 448px;
+  max-height: 100%;
   width: 100%;
 }
 
@@ -397,12 +440,11 @@ export default {
   width: 100%;
   height: 100%;
   flex-grow: 1;
+  padding: 0 40px 20px;
 
-  .formSection._layout-modal & {
-    padding: 0 40px 20px;
-  }
+  .formSection._isPage & {
+    padding: 20px 0px 20px;
 
-  .formSection._layout-page & {
     @media screen and (min-width: 640px) {
       padding: 60px 0;
     }
@@ -419,9 +461,20 @@ export default {
   justify-content: flex-start;
   align-items: center;
   width: 100%;
+
+  .formSection._isPage &._sticky {
+    left: 0 !important;
+    width: 100vw !important;
+  }
 }
 
 .payBtn {
   width: 100%;
+  transition: border-radius 0.2s ease-out;
+
+  .formSection._isPage .footer._sticky & {
+    transition: border-radius 0.2s ease-out;
+    border-radius: 0;
+  }
 }
 </style>

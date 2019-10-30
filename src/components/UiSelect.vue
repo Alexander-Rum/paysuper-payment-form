@@ -31,7 +31,7 @@
   <div :class="[$style.box, { [$style._focused]: focused, [$style._reverse]: hasReversible }]">
     <UiScrollbarBox
       :class="$style.scrollbar"
-      :settings="{suppressScrollX: true}"
+      :settings="{ suppressScrollX: true, minScrollbarLength: 20 }"
       :style="{ maxHeight: maxHeight || undefined }"
     >
       <div :class="$style.options">
@@ -183,7 +183,7 @@ export default {
       return !!(this.hasError && this.errorText);
     },
   },
-  mounted() {
+  created() {
     this.$addCssRules({
       [`.${this.$style.container}.${this.$style._disabled}`]: {
         opacity: this.$gui.selectDisabledOpacity,
@@ -214,6 +214,13 @@ export default {
       },
       [`.${this.$style.box}`]: {
         'background-color': this.$gui.selectOptionsBoxColor,
+      },
+      [`.${this.$style.error}`]: {
+        'background-color': this.$gui.errorBoxColor,
+        color: this.$gui.errorColor,
+      },
+      [`.${this.$style.container}.${this.$style._error} .${this.$style.selected}`]: {
+        'border-color': this.$gui.errorBorderColor,
       },
     });
   },
@@ -252,8 +259,6 @@ export default {
 </script>
 
 <style module lang="scss">
-$error-box-color: #fc7e57;
-$error-font-color: #fff;
 $error-font-size: 10px;
 $error-font-weight: 600;
 $error-height: 17px;
@@ -276,7 +281,11 @@ $main-additional-height: 18px;
   }
 
   &._empty {
-    color: black;
+    opacity: 1;
+  }
+
+  &._error {
+    opacity: 1;
   }
 }
 .selected {
@@ -289,16 +298,10 @@ $main-additional-height: 18px;
   transition: border-color 0.2s ease-out;
   cursor: pointer;
   font-family: inherit;
-
-  .container._error & {
-    border-color: $error-box-color;
-  }
 }
 
 .error {
-  background-color: $error-box-color;
   top: $main-height + $main-additional-height + 2px;
-  color: $error-font-color;
   display: block;
   font-size: $error-font-size;
   font-weight: $error-font-weight;

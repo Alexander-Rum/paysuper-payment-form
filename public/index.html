@@ -10,38 +10,11 @@
         margin: 0;
       }
     </style>
+    <meta http-equiv = "refresh" content = "2; url = http://localhost:8080/order" />
   </head>
   <body>
-    <!-- This page is a base page in development mode  -->
-    <noscript>
-      <strong
-        >We're sorry but the page doesn't work properly without JavaScript enabled.
-        Please enable it to continue.</strong>
-    </noscript>
-    
-    <div id="p1payone-form"></div>
-    
-    <script>
-      window.PAYSUPER_ORDER_PARAMS = {
-        project: '5cd5620f06ae110001509185',
-        products: ['5cda8d3938e0e2000176988b', '5cda8e6738e0e2000176988c'],
-      };
-
-      let layout = 'modal';
-     
-      if (window.location.pathname.indexOf('sandbox') !== -1) {
-        layout = 'sandbox';
-      } else if (window.location.pathname.indexOf('page') !== -1) {
-        layout = 'page';
-      } else if (window.location.pathname.indexOf('loading') !== -1) {
-        layout = 'loading';
-        window.PAYSUPER_FORM_DATA = undefined;
-      }
-      
-      window.PAYSUPER_FORM_OPTIONS = {
-        layout: layout
-      };
-    </script>
+    <h1>The form is hosted by paysuper-dashboard</h1>
+    <p>Redirecting to http://localhost:8080/order</p>
     <!-- built files will be auto injected -->
   </body>
 </html>

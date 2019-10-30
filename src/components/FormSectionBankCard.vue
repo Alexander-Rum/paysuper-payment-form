@@ -13,72 +13,51 @@
   <UiCardField
     v-else
     v-model="innerValue.cardNumber"
+    ref="cardNumberField"
     name="pan"
-    :class="$style.formItem"
+    type="tel"
+    :class="[$style.formItem, { [$style._oneLine]: isOneLine }]"
     :hasError="$isFieldInvalid('innerValue.cardNumber')"
     :errorText="$t('FormSectionBankCard.cardNumberInvalid')"
+    @keyup.native="moveFocusToFieldOnComplete('cardNumber', 16, 'expiryDateField')"
   />
-  <div :class="$style.formItem">
+  <div :class="[$style.formItem, { [$style._oneLine]: isOneLine }]">
     <UiTextField
       v-model="innerValue.expiryDate"
+      ref="expiryDateField"
       name="cc-exp"
       mask="##/##"
+      type="tel"
       :class="$style.expiry"
       :hasError="$isFieldInvalid('innerValue.expiryDate')"
       :errorText="$t('FormSectionBankCard.expiryDateInvalid')"
       :label="$t('FormSectionBankCard.expiryDate')"
+      @keyup.native="moveFocusToFieldOnComplete('expiryDate', 4, 'cvvField')"
+      @keyup.native.delete="moveFocusBackOnEmpty('expiryDate', 'cardNumberField')"
     />
-    <div :class="$style.cvvBox">
-      <UiTextField
-        v-model="innerValue.cvv"
-        name="cvv"
-        mask="###"
-        type="password"
-        :hasError="$isFieldInvalid('innerValue.cvv')"
-        :errorText="$t('FormSectionBankCard.cvvError')"
-        :label="$t('FormSectionBankCard.cvv')"
-      />
-      <div
-        :class="$style.cvvInfo"
-        @mouseenter="isCvvInfoShown = true"
-        @mouseleave="isCvvInfoShown = false"
-      >
-        <IconInfo />
-        <UiTip
-          innerPosition="right"
-          section="form"
-          :class="$style.cvvTip"
-          :visible="isCvvInfoShown"
-        >
-          <div :class="$style.cvvContainer">
-            <IconCvvCard :class="$style.cvvIconCard" />
-            <div v-html="$t('FormSectionBankCard.cvvInfo')" />
-          </div>
-        </UiTip>
-      </div>
-    </div>
+    <UiCvvField
+      v-model="innerValue.cvv"
+      ref="cvvField"
+      :hasError="$isFieldInvalid('innerValue.cvv')"
+      @keyup.native="moveFocusToFieldOnComplete('cvv', 3, 'emailField')"
+      @keyup.native.delete="moveFocusBackOnEmpty('cvv', 'expiryDateField')"
+    />
   </div>
   <UiTextField
-    v-model="innerValue.cardHolder"
-    name="card_holder"
-    :hasError="$isFieldInvalid('innerValue.cardHolder')"
-    :errorText="$t('FormSectionBankCard.cardHolderError')"
-    :class="$style.formItem"
-    :label="$t('FormSectionBankCard.cardholder')"
-  />
-  <UiTextField
     v-model="innerValue.email"
+    ref="emailField"
     name="email"
     type="email"
     :class="$style.formItem"
     :hasError="$isFieldInvalid('innerValue.email')"
     :errorText="$t('FormSectionBankCard.emailInvalid')"
     :label="$t('FormSectionBankCard.email')"
+    @keyup.native.delete="moveFocusBackOnEmpty('email', 'cvvField')"
   />
   <template v-if="isGeoFieldsExposed">
     <UiSelect
-      maxHeight="240px"
       v-model="innerValue.country"
+      :maxHeight="isPageView ? '120px' : '240px'"
       :options="countries"
       :placeholderLabel="$t('FormSectionBankCard.country')"
       :hasReversible="true"
@@ -132,7 +111,12 @@
 </template>
 
 <script>
-import { email, required, minLength } from 'vuelidate/lib/validators';
+import {
+  email,
+  required,
+  maxLength,
+  minLength,
+} from 'vuelidate/lib/validators';
 import { toInteger, extend, forEach } from 'lodash-es';
 import { gtagEvent } from '@/analytics';
 
@@ -172,7 +156,7 @@ export default {
       type: RegExp,
     },
     /**
-     * @typedef {{ cardNumber: string, expiryDate: string, cardHolder: string }} Card
+     * @typedef {{ cardNumber: string, expiryDate: string }} Card
      * @type {Card[]}
      */
     cards: {
@@ -193,6 +177,14 @@ export default {
     isZipInvalid: {
       type: Boolean,
       required: true,
+    },
+    isPageView: {
+      type: Boolean,
+      default: false,
+    },
+    isOneLine: {
+      type: Boolean,
+      default: false,
     },
   },
 
@@ -240,9 +232,7 @@ export default {
       cvv: {
         required,
         minLength: minLength(3),
-      },
-      cardHolder: {
-        required,
+        maxLength: maxLength(4),
       },
       email: {
         required,
@@ -281,7 +271,26 @@ export default {
     this.emitOnInnerValueChanges();
   },
 
+  mounted() {
+    this.focusCardNumberField();
+  },
+
   methods: {
+    focusCardNumberField() {
+      this.$nextTick(() => {
+        this.$refs.cardNumberField.focus();
+      });
+    },
+    moveFocusToFieldOnComplete(fieldValueName, length, nextField) {
+      if (this.innerValue[fieldValueName].length === length) {
+        this.$refs[nextField].focus();
+      }
+    },
+    moveFocusBackOnEmpty(fieldValueName, prevField) {
+      if (this.innerValue[fieldValueName].length === 0) {
+        this.$refs[prevField].focus();
+      }
+    },
     emitOnInnerValueChanges() {
       forEach(this.innerValue, (a, key) => {
         this.$watch(`innerValue.${key}`, (value) => {
@@ -313,62 +322,20 @@ export default {
   flex-wrap: wrap;
   position: relative;
   align-content: flex-start;
+  justify-content: space-between;
 }
 .formItem {
   display: flex;
   justify-content: space-between;
   width: 100%;
+
+  &._oneLine {
+    width: calc(50% - 10px);
+  }
 }
 .expiry {
   @include if-ltr {
     margin-right: 20px;
-  }
-}
-.cvvBox {
-  position: relative;
-  width: 100%;
-
-  @include if-rtl {
-    margin-right: 20px;
-  }
-}
-.cvvInfo {
-  position: absolute;
-  display: flex;
-  top: 20px;
-  cursor: pointer;
-
-  @include if-ltr {
-    right: 0;
-  }
-
-  @include if-rtl {
-    left: 0;
-  }
-}
-.cvvTip {
-  @include if-ltr {
-    margin-right: -20px;
-  }
-
-  @include if-rtl {
-    margin-left: -20px;
-  }
-}
-.cvvContainer {
-  display: flex;
-  padding: 8px 5px;
-  width: 250px;
-  justify-content: flex-start;
-  align-items: center;
-}
-.cvvIconCard {
-  @include if-ltr {
-    margin-right: 10px;
-  }
-
-  @include if-rtl {
-    margin-left: 10px;
   }
 }
 .remember {

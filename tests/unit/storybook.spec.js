@@ -11,8 +11,14 @@ const scheme = {
     'default',
   ],
   UiSelect: [
-    'default',
-    'focused',
+    {
+      story: 'default',
+      wait: 300,
+    },
+    {
+      story: 'focused',
+      wait: 300,
+    },
   ],
   UiTip: [
     'default',
@@ -101,6 +107,35 @@ const scheme = {
         height: 1450,
       },
     },
+  ],
+  CartSection: [
+    {
+      story: 'modal',
+      viewport: {
+        width: 500,
+        height: 4200,
+      },
+    },
+    {
+      story: 'page',
+      viewport: {
+        width: 700,
+        height: 6400,
+      },
+    },
+    {
+      story: 'page',
+      viewport: {
+        width: 550,
+        height: 5200,
+      },
+    },
+  ],
+  PlatformSelect: [
+    'default',
+  ],
+  PaymentAreaWarning: [
+    'default',
   ],
 };
 

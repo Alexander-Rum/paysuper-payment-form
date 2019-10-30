@@ -37,7 +37,7 @@ window.PAYSUPER_FORM_DATA = {
 window.PAYSUPER_API_URL = 'https://p1payapi.tst.protocol.one';
 window.PAYSUPER_WEBSOCKET_URL = 'wss://cf.tst.protocol.one/connection/websocket';
 </script>
-<script src="https://static.protocol.one/payone/form/latest/p1payone-form.js"></script>
+<script src="https://cdn.pay.super.com/payform/latest/paysuper-form.js"></script>
 ```
 
 ### Library URLs
@@ -48,9 +48,9 @@ https://static.protocol.one/minio/payone/
 https://static.protocol.one/payone/form/dev/p1payone-form.js
 Updates automatically with `master` branch updates
 
-#### By release
-https://static.protocol.one/payone/form/latest/p1payone-form.js
-https://static.protocol.one/payone/form/v1.0.9/p1payone-form.js
+#### Production release
+https://cdn.pay.super.com/payform/latest/paysuper-form.js
+https://cdn.pay.super.com/payform/v2.2.1-alpha/paysuper-form.js
 Updates width actual version releases (`v*` tag pushed into repo)
 
 ## Development

@@ -5,11 +5,22 @@ import {
 } from 'lodash-es';
 import { postMessage } from '../postMessage';
 import PaymentConnection from '@/tools/PaymentConnection';
+import useDelayedCallbackOnPromise from '@/helpers/useDelayedCallbackOnPromise';
 import i18n from '@/i18n';
 import { gtagEvent, gtagSet } from '@/analytics';
 
+function getErrorCodeTranslation(code) {
+  const noTranslationMessage = 'Unknown error';
+  if (!code) {
+    return noTranslationMessage;
+  }
+  return get(i18n.messages[i18n.locale], `errorCodes.${code}`)
+    || get(i18n.messages[i18n.locale], `errorCodes.${code.slice(0, 2)}*`)
+    || noTranslationMessage;
+}
+
 const availableChannelStatuses = [
-  'COMPLETED', 'DECLINED', 'CANCELLED',
+  'COMPLETED', 'DECLINED',
 ];
 
 const allowedPaymentStatuses = [
@@ -24,7 +35,7 @@ const actionResultsByStatus = {
     if (data) {
       return {
         type: 'customError',
-        message: i18n.t(`errorCodes.${data.code}`),
+        message: getErrorCodeTranslation(data.code),
       };
     }
     return { type: 'unknownError' };
@@ -33,10 +44,9 @@ const actionResultsByStatus = {
   DECLINED(data) {
     return {
       type: 'customError',
-      message: i18n.t(`errorCodes.${data.decline.code}`),
+      message: getErrorCodeTranslation(data.decline.code),
     };
   },
-  // CANCELLED: () => ({ type: 'unknownError' }),
   INTERRUPTED: () => ({ type: 'customError', message: i18n.t('errorCodes.redirectWindowClosed') }),
   FAILED_TO_CREATE(data) {
     if (data) {
@@ -45,7 +55,7 @@ const actionResultsByStatus = {
       }
       return {
         type: 'customError',
-        message: i18n.t(`errorCodes.${data.code}`),
+        message: getErrorCodeTranslation(data.code),
       };
     }
     return { type: 'unknownError' };
@@ -66,12 +76,15 @@ function setPaymentStatus(commit, name, extraData) {
     commit('isPaymentLoading', true);
   }
 
-  if (includes(['FAILED_TO_CREATE', 'INTERRUPTED', 'COMPLETED', 'DECLINED', 'CANCELLED'], name)) {
+  if (includes(['FAILED_TO_CREATE', 'INTERRUPTED', 'COMPLETED', 'DECLINED'], name)) {
     commit('isPaymentLoading', false);
   }
 }
 
 function setGeoParams(commit, data) {
+  // Drop to defaults
+  commit('isUserCountryConfirmRequested', false);
+
   if (data.user_ip_data) {
     commit('userIpGeoData', data.user_ip_data);
   }
@@ -97,6 +110,7 @@ export default {
     orderParams: null,
     orderData: null,
     activePaymentMethodId: '',
+    currentPlatformId: '',
     isPaymentLoading: false,
     isFormLoading: false,
     actionResult: null,
@@ -129,6 +143,9 @@ export default {
     },
     orderData(state, value) {
       state.orderData = value;
+    },
+    currentPlatformId(state, value) {
+      state.currentPlatformId = value;
     },
     activePaymentMethodId(state, value) {
       state.activePaymentMethodId = value;
@@ -173,75 +190,57 @@ export default {
   },
 
   actions: {
-    async initState({ commit, dispatch }, { orderParams, options }) {
+    async initState({ commit }, { orderParams, orderData, options }) {
       commit('options', options);
       commit('orderParams', orderParams);
-      await dispatch('createOrder');
-
-      // if (localStorage) {
-      //   const cards = localStorage.getItem('cards');
-
-      //   try {
-      //     commit('cards', JSON.parse(cards) || []);
-      //   } catch (e) {
-      //     commit('cards', []);
-      //   }
-      // }
-    },
-
-    async createOrder({ state, commit, rootState }) {
-      const {
-        project, token, products, amount, currency, type,
-      } = state.orderParams;
-      if (amount) {
-        assert(currency, 'PaySuper: currency is not set');
-      }
-      try {
-        const { data } = await axios.post(
-          `${rootState.apiUrl}/api/v1/order`,
-          {
-            project,
-            ...(token ? { token } : {}),
-            ...(products ? { products } : {}),
-            ...(amount ? { amount, currency } : {}),
-            ...(type ? { type } : {}),
-          },
-        );
-        const orderData = data.payment_form_data;
-
-        commit('orderData', orderData);
-
-        const bankCardIndex = findIndex(orderData.payment_methods, { type: 'bank_card' });
-        commit('activePaymentMethodId', orderData.payment_methods[bankCardIndex].id);
-
-        setGeoParams(commit, orderData);
-        setPaymentStatus(commit, 'NEW');
-
-        const items = (get(orderData, 'items') || []).map((item, index) => ({
-          id: item.id,
-          name: item.name,
-          list_name: 'Cart items',
-          list_position: index + 1,
-          price: `${item.amount}`,
-          quantity: 1,
-        }));
-
-        gtagEvent('begin_checkout', {
-          items: items.length
-            ? items
-            : [{
-              id: project,
-              name: 'Virtual Currency',
-              price: `${orderData.amount}`,
-              quantity: 1,
-            }],
-        });
-      } catch (error) {
+      // orderData.payment_methods[bankCardIndex].saved_cards = [
+      //   {
+      //     id: 23123,
+      //     pan: '3000000000434342',
+      //     expire: {
+      //       month: '01',
+      //       year: '22',
+      //     },
+      //   },
+      // ];
+      // commit('cards', orderData.payment_methods[bankCardIndex].saved_cards);
+      commit('orderData', orderData);
+      if (orderData.error) {
         setPaymentStatus(
           commit, 'FAILED_TO_BEGIN',
-          (error.response ? error.response.data : undefined),
+          orderData.error,
         );
+        return;
       }
+
+      const bankCardIndex = findIndex(orderData.payment_methods, { type: 'bank_card' });
+      if (orderData.platforms) {
+        commit('currentPlatformId', orderData.platforms[0].id);
+      }
+      commit('activePaymentMethodId', orderData.payment_methods[bankCardIndex].id);
+
+      setGeoParams(commit, orderData);
+      setPaymentStatus(commit, 'NEW');
+
+      const items = (get(orderData, 'items') || []).map((item, index) => ({
+        id: item.id,
+        name: item.name,
+        list_name: 'Cart items',
+        list_position: index + 1,
+        price: `${item.amount}`,
+        quantity: 1,
+      }));
+
+      gtagEvent('begin_checkout', {
+        items: items.length
+          ? items
+          : [{
+            id: orderParams.project,
+            name: 'Virtual Currency',
+            price: `${orderData.amount}`,
+            quantity: 1,
+          }],
+      });
     },
 
     setActivePaymentMethodById({ commit }, value) {
@@ -260,16 +259,10 @@ export default {
     async createPayment({
       state, rootState, commit,
     }, {
-      cardNumber, expiryDate, cvv, cardHolder, ewallet, crypto, email, hasRemembered,
+      cardNumber, expiryDate, cvv, ewallet, crypto, email, hasRemembered,
       country, city, zip,
     }) {
       setPaymentStatus(commit, 'BEFORE_CREATED');
-
-      // if (hasRemembered) {
-      //   const cards = [...state.cards, { cardNumber, expiryDate, cardHolder }];
-      //   commit('cards', cards);
-      //   localStorage.setItem('cards', JSON.stringify(cards));
-      // }
 
       const paymentConnection = new PaymentConnection(
         {
@@ -327,7 +320,8 @@ export default {
         cvv,
         month: expiryDate.slice(0, 2),
         year: expiryDate.slice(2, 4),
-        card_holder: cardHolder,
+        // https://protocolone.tpondemand.com/restui/board.aspx?#page=userstory/192384
+        card_holder: 'Cardholder',
         order_id: state.orderData.id,
         pan: cardNumber,
         payment_method_id: state.activePaymentMethodId,
@@ -345,27 +339,22 @@ export default {
         ),
       };
 
-      let redirectUrl = '';
-      let delayHasPassed = false;
-      setTimeout(() => {
-        if (redirectUrl) {
-          paymentConnection.setRedirectWindowLocation(redirectUrl);
-        }
-        delayHasPassed = true;
-      }, 2000);
-
       try {
-        const { data } = await axios.post(
-          `${rootState.apiUrl}/api/v1/payment`,
-          request,
+        // Delay is used for the redirect window not to open too soon
+        await useDelayedCallbackOnPromise(
+          axios.post(
+            `${rootState.apiUrl}/api/v1/payment`,
+            request,
+          ),
+          ({ data }) => {
+            const redirectUrl = data.redirect_url;
+            paymentConnection.setRedirectWindowLocation(redirectUrl);
+            setPaymentStatus(commit, 'CREATED', {
+              redirectUrl,
+            });
+          },
+          2000,
         );
-        redirectUrl = data.redirect_url;
-        if (delayHasPassed) {
-          paymentConnection.setRedirectWindowLocation(redirectUrl);
-        }
-        setPaymentStatus(commit, 'CREATED', {
-          redirectUrl: data.redirect_url,
-        });
       } catch (error) {
         paymentConnection.closeRedirectWindow();
 
@@ -472,6 +461,20 @@ export default {
         } else {
           console.error(error);
         }
+      }
+    },
+
+    async changePlatform({ state, commit, rootState }, platform) {
+      try {
+        await axios.post(
+          `${rootState.apiUrl}/api/v1/orders/${state.orderData.id}/platform`,
+          {
+            platform,
+          },
+        );
+        commit('currentPlatformId', platform);
+      } catch (error) {
+        console.error(error);
       }
     },
   },

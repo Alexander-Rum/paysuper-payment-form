@@ -25,10 +25,16 @@ export default {
         'background-color': this.$gui.formBackgroundColor,
       },
       [`.${this.$style.link}`]: {
-        color: this.$gui.headerTextColor,
+        color: this.$gui.layoutTextColor,
+      },
+      [`.${this.$style.link}:hover`]: {
+        color: this.$gui.baseHoverColor,
       },
       [`.${this.$style.iconSupport}`]: {
-        fill: this.$gui.headerTextColor,
+        fill: this.$gui.layoutTextColor,
+      },
+      [`.${this.$style.iconSupport}:hover`]: {
+        fill: this.$gui.baseHoverColor,
       },
       [`.${this.$style.locale}.${this.$style._opened}::after`]: {
         'border-bottom-color': this.$gui.localeChangerModalBoxColor,
@@ -60,7 +66,7 @@ export default {
             href="#"
             :class="$style.link"
             @click="fireAnalyticsEvent('PaySuper')"
-          >Pay Super</a>
+          >PaySuper</a>
           <a
             href="#"
             :class="$style.link"
@@ -138,7 +144,6 @@ export default {
   text-decoration: none;
 
   &:hover {
-    color: #00d697;
     text-decoration: none;
   }
 
@@ -166,9 +171,7 @@ export default {
   }
 }
 .iconSupport {
-  &:hover {
-    fill: #00d697;
-  }
+  opacity: 1;
 }
 .content {
   display: flex;

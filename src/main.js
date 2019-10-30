@@ -6,8 +6,7 @@ import * as Sentry from '@sentry/browser';
 import Vue from 'vue';
 import assert from 'assert';
 import Sandbox from '@/Sandbox.vue';
-import Page from '@/Page.vue';
-import Modal from '@/Modal.vue';
+import App from '@/App.vue';
 import Loading from '@/Loading.vue';
 import '@/plugins/vuelidate';
 import store from '@/store/RootStore';
@@ -19,64 +18,68 @@ import viewSchemes from '@/viewSchemes';
 import '@/globalComponents';
 import '@/vueExtentions';
 import { gtagConfig, gtagSet } from '@/analytics';
-
-const isProd = process.env.NODE_ENV === 'production';
+import { apiUrl, sentryDsn } from '@/constants';
+import 'intl';
+import 'intl/locale-data/jsonp/en';
 
 Vue.config.productionTip = false;
-
+const isProd = process.env.NODE_ENV === 'production';
 if (isProd) {
   Sentry.init({
-    dsn: 'https://3e4a24900f064243a9de45162660a66d@sentry.tst.protocol.one/3',
-    integrations: [new Sentry.Integrations.Vue({ Vue })],
+    dsn: sentryDsn,
+    integrations: [new Sentry.Integrations.Vue({ Vue, attachProps: true })],
+    environment: process.env.VUE_APP_BUILD_PURPOSE,
   });
 }
 
+const mountPoint = '#paysuper-payment-form';
 const isPageInsideIframe = window.location !== window.parent.location;
 
 /**
  * Mounts the app into element
  *
- * @param {Object} orderParams
- * @param {Object} optionsCustom
+ * @param {Object} customOptions
  */
-async function mountApp(orderParams, optionsCustom = {}) {
+async function mountApp(customOptions = {}) {
+  const { orderData, orderParams, baseOptions } = window.PAYSUPER_PAYMENT_FORM;
   assert(
-    document.querySelector('#p1payone-form'),
-    'Define "#p1payone-form" element in the document to mount the app',
+    document.querySelector(mountPoint),
+    `Define "${mountPoint}" element in the document to mount the app`,
   );
 
-  if (!window.opener) {
-    if (isPageInsideIframe) {
-      assert(orderParams, 'The order params are not recieved');
-    } else {
-      assert(orderParams, '"window.PAYSUPER_ORDER_PARAMS" in not defined or empty');
-    }
-  }
+  // if (isPageInsideIframe) {
+  //   if (!window.PAYSUPER_ORDER_PARAMS) {
+  //     assert(orderParams, '"window.PAYSUPER_ORDER_PARAMS" is not defined or empty');
+  //   } else if (!orderParams) {
+  //     assert(orderParams, 'The order params are not recieved');
+  //   }
+  // }
 
   const language = getLanguage(localesScheme, navigator);
   const options = {
-    apiUrl: window.PAYSUPER_API_URL || 'https://p1payapi.tst.protocol.one',
+    apiUrl,
     email: '',
     viewScheme: 'dark',
     viewSchemeConfig: null,
     layout: 'page',
     isPageInsideIframe,
     language,
-    ...optionsCustom,
+    ...baseOptions,
+    ...customOptions,
   };
 
   if (options.layout !== 'loading') {
     store.dispatch('initState', {
       orderParams,
+      orderData,
       options,
     });
   }
 
-  let appComponent = Modal;
+  let appComponent = App;
   if (options.layout === 'page') {
-    appComponent = Page;
     if (isPageInsideIframe) {
-      // Prevents scrollbar dangling before formResize
+      // Prevents scrollbar dangling before formResize ?
       document.body.style.overflow = 'hidden';
       document.body.parentNode.style.overflow = 'hidden';
     }
@@ -91,6 +94,7 @@ async function mountApp(orderParams, optionsCustom = {}) {
     ...viewSchemes[options.viewScheme],
     ...(options.viewSchemeConfig || {}),
   };
+  Vue.prototype.$layout = options.layout;
 
   new VueApp({
     store,
@@ -106,19 +110,19 @@ async function mountApp(orderParams, optionsCustom = {}) {
 
       gtagConfig('UA-142750977-1', { page_path: `/${options.layout}` });
     },
-  }).$mount('#p1payone-form');
+  }).$mount(mountPoint);
 }
 
-if (window.opener || isPageInsideIframe) {
+if (isPageInsideIframe) {
   receiveMessages(window, {
     REQUEST_INIT_FORM(data = {}) {
-      const { orderParams, options } = data;
-      mountApp(orderParams, options);
+      const { options } = data;
+      mountApp(options);
     },
   });
 } else {
   // Case where the form is opened by as actual page inside browser, not inside iframe
-  mountApp(window.PAYSUPER_ORDER_PARAMS, window.PAYSUPER_FORM_OPTIONS);
+  mountApp();
 }
 
 postMessage('INITED');

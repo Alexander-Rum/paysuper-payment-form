@@ -1,11 +1,9 @@
 <script>
-import CartSection from '@/components/CartSection.vue';
-import cartTestData from './cartTestData';
+import { keysIn } from 'lodash-es';
 import ActionProcessing from '@/components/ActionProcessing.vue';
 
 export default {
   components: {
-    CartSection,
     ActionProcessing,
   },
   data() {
@@ -18,14 +16,14 @@ export default {
       actionProcessing: {
         icon: 'card',
       },
-      cartItems: cartTestData,
-      cartItemsCount: 1,
-      cartView: 'default',
     };
   },
-  watch: {
-    cartItemsCount() {
-      this.cartView = 'default';
+  computed: {
+    iconComponentsList() {
+      const iconComponentNames = keysIn(this.$options.components)
+        .filter(name => /^Icon[A-Z]/.test(name));
+
+      return iconComponentNames;
     },
   },
   methods: {
@@ -95,21 +93,20 @@ export default {
         <option value="other">other</option>
       </select>
     </div>
-    <br>
-    <div>
-      <UiScrollbarBox style="width: 320px; height: 440px; background: #333B50;">
-        <CartSection
-          :items="cartItems.slice(0, cartItemsCount)"
-          :view="cartView"
-        />
-      </UiScrollbarBox>
-      <input type="number" min="1" max="7" v-model="cartItemsCount">
-      <select v-if="cartItemsCount == 1" v-model="cartView">
-        <option value="default">default</option>
-        <option value="promo">promo</option>
-      </select>
-    </div>
   </div>
+  <table class="table">
+    <tr
+      v-for="item in iconComponentsList"
+      :key="item"
+    >
+      <td class="cell">
+        {{ item }}
+      </td>
+      <td class="cell">
+        <component class="icon" :is="item"></component>
+      </td>
+    </tr>
+  </table>
 </div>
 </template>
 
@@ -147,5 +144,20 @@ export default {
   max-width: 100px;
   margin-right: 20px;
   cursor: pointer;
+}
+
+.icon {
+  max-width: 50px;
+  max-height: 50px;
+}
+
+.table {
+  border-collapse: collapse;
+}
+
+.cell {
+  padding: 10px 15px;
+  border: 1px solid #ccc;
+  background: rgba(0, 0, 0, 0.05);
 }
 </style>

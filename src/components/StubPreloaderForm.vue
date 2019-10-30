@@ -12,6 +12,10 @@ export default {
         return includes(['modal', 'page'], value);
       },
     },
+    isVerticalModal: {
+      default: false,
+      type: Boolean,
+    },
   },
 
   data() {
@@ -49,7 +53,11 @@ export default {
 </script>
 
 <template>
-<div :class="[$style.stubPreloaderForm, $style[`_layout-${layout}`]]">
+<div
+  :class="[
+    $style.stubPreloaderForm,
+    $style[`_layout-${layout}`],
+    { [$style._isVertical]: isVerticalModal }]">
   <div :class="$style.items">
     <div
       :class="$style.item"
@@ -90,6 +98,10 @@ export default {
   &._layout-page {
     margin: 60px 0;
   }
+
+  &._isVertical {
+    max-height: 100%;
+  }
 }
 .items {
   display: flex;
@@ -100,6 +112,12 @@ export default {
 
   .stubPreloaderForm._layout-page & {
     padding: 0;
+  }
+
+  .stubPreloaderForm._isVertical & {
+    height: calc(100% - 60px);
+    align-content: space-between;
+    padding-bottom: 24px;
   }
 }
 .item {
@@ -159,14 +177,38 @@ export default {
       margin-left: auto;
     }
   }
+
+  .stubPreloaderForm._isVertical & {
+    margin-top: 24px;
+
+    &:nth-child(2) {
+      flex-basis: calc(50% - 10px);
+    }
+    &:nth-child(3),
+    &:nth-child(4) {
+      flex-basis: calc(25% - 15px);
+      margin-left: 20px;
+    }
+    &:nth-child(3) {
+      &::after {
+        animation-delay: 0.152s;
+      }
+
+      @include if-rtl {
+        margin-right: 20px;
+        margin-left: 0;
+      }
+    }
+  }
 }
 .button {
   display: flex;
   align-items: flex-end;
   flex-grow: 1;
+  z-index: 2;
 
   & > div {
-    height: 70px;
+    height: 60px;
     width: 100%;
     display: flex;
     justify-content: center;

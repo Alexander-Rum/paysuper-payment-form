@@ -37,9 +37,21 @@
     },
     "success": {
       "title": "Let's play!",
-      "titleSubSlave": "Your transaction ID is",
+      "titleSubSlave": {
+        "key": "Activate this key on license provider website. <a href='{link}'>Instruction</a>",
+        "product": "You’ve bought a new game. Enjoy your new experience!",
+        "simple": "Your payment is successfully accepted!",
+        "virtual_items": "A new item awaits you in the game. Enjoy your new experience!",
+        "virtual_currency": "A pack of currency awaits you in the game!"
+      },
       "descriptionSlaveInitial": "Leave your email to recieve the bill",
-      "descriptionSlaveFinal": "We sent payment bill to",
+      "descriptionSlaveFinal": {
+        "key": "We sent payment confirmation and activation key to",
+        "product": "We sent payment confirmation and access link to",
+        "simple": "We sent payment confirmation to",
+        "virtual_items": "We sent payment confirmation to",
+        "virtual_currency": "We sent payment confirmation to"
+      },
       "email": "Email"
     }
   },
@@ -87,18 +99,16 @@
     "cvv": "CVC/CVV",
     "cvvInfo": "Three digits located<br>on the back of the card",
     "cvvError": "Invalid value",
-    "cardholder": "Cardholder name",
-    "cardHolderError": "Enter cardholder name",
     "email": "Email to receive the purchase",
     "emailInvalid": "Email is invalid",
     "remember": "Remember me",
     "rememberInfo": "Security of billing data storage is provided in accordance with the requirements of the PCI DSS standard, using 3D Secure and SSL protocols",
     "city": "City",
-    "cityInvalid": "Неверный город",
+    "cityInvalid": "Invalid city",
     "country": "Country",
     "countryInvalid": "Choose the country",
     "zip": "ZIP code",
-    "zipInvalid": "Неверный почтовый индекс"
+    "zipInvalid": "Invalid ZIP code"
   },
   "LayoutFooter": {
     "userAgreement": "User Agreement",
@@ -111,8 +121,7 @@
     "purchaseInformation": "Purchase information",
     "paymentManagement": "Payment management",
     "userAgreement": "User Agreement",
-    "refundPolicy": "Refund Policy",
-    "refundAdditionalInfo": "You can return this game in 10 days"
+    "refundPolicy": "Refund Policy"
   },
   "ModalCart": {
     "termsOfUse": "Terms of Use",
@@ -121,8 +130,7 @@
     "purchaseInformation": "Purchase information",
     "paymentManagement": "Payment management",
     "userAgreement": "User Agreement",
-    "refundPolicy": "Refund Policy",
-    "refundAdditionalInfo": "You can return this game in 10 days"
+    "refundPolicy": "Refund Policy"
   },
   "PaymentAreaWarning": {
     "oops": "Oooops",

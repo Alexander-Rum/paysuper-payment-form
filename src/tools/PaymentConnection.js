@@ -1,9 +1,7 @@
 import Centrifuge from 'centrifuge';
 import Events from 'events';
 import { receiveMessages, payoneFormSourceName } from '@/postMessage';
-
-const websocketServerUrl = window.PAYSUPER_WEBSOCKET_URL
-  || 'wss://cf.tst.protocol.one/connection/websocket';
+import { formLoadingPageUrl, websocketServerUrl } from '@/constants';
 
 export default class PaymentConnection extends Events.EventEmitter {
   constructor({
@@ -29,12 +27,7 @@ export default class PaymentConnection extends Events.EventEmitter {
     });
     this.centrifuge.connect();
 
-    this.redirectWindow = this.window.open(
-      process.env.NODE_ENV === 'development'
-        ? 'http://localhost:4040/loading'
-        : 'https://paysupermgmt.tst.protocol.one/payform-loading',
-      '_blank',
-    );
+    this.redirectWindow = this.window.open(formLoadingPageUrl, '_blank');
     this.redirectWindowClosedInterval = setInterval(() => {
       if (this.redirectWindow.closed) {
         this.emit('redirectWindowClosedByUser');

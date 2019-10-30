@@ -39,7 +39,7 @@
       "title": "Давай сыграем!",
       "titleSubSlave": "ID вашего платежа:",
       "descriptionSlaveInitial": "Введите email, чтобы получить счёт",
-      "descriptionSlaveFinal": "Мы выслали чек на",
+      "descriptionSlaveFinal": "Мы выслали ваш чек на",
       "email": "Email"
     }
   },

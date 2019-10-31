@@ -11,20 +11,20 @@
   "product": "Product",
   "commission": "Commission",
   "vat": "VAT",
-  "summ": "Summ",
+  "summ": "Sum",
   "ActionProcessing": {
     "title": "You will now be redirected<br>to the bank site for passing 3d security",
     "description": [
       "After passing the 3d security, ",
-      "the status of receiving money may <br>come with a delay, ",
-      "it depends directly on the bank in which you pay"
+      "the status of receiving money may <br>come with delay, ",
+      "it depends directly on the bank you use for payment."
     ]
   },
   "ActionResult": {
     "noMoneyError": {
       "title": "Declined",
       "subtitle": "You haven’t enough money",
-      "description": "Please go back<br>and try other pay method"
+      "description": "Please go back<br>and try another payment method"
     },
     "unknownError": {
       "title": "Bad luck",
@@ -44,7 +44,7 @@
         "virtual_items": "A new item awaits you in the game. Enjoy your new experience!",
         "virtual_currency": "A pack of currency awaits you in the game!"
       },
-      "descriptionSlaveInitial": "Leave your email to recieve the bill",
+      "descriptionSlaveInitial": "Leave your email to get payment receipt",
       "descriptionSlaveFinal": {
         "key": "We sent payment confirmation and activation key to",
         "product": "We sent payment confirmation and access link to",
@@ -59,7 +59,7 @@
     "subtotal": "Subtotal",
     "taxes": "Taxes",
     "total": "Total",
-    "voluntaryAmount": "Voluntary amount"
+    "voluntaryAmount": "Arbitrary amount"
   },
   "FormSection": {
     "prependLabel": "Pay with",
@@ -141,7 +141,7 @@
     "remove": "Delete"
   },
   "OrderCreationError": {
-    "title": "We're sorry, but we could not create the order to make the payment",
+    "title": "We're sorry, but we could not create the order to make payment",
     "tryAgain": "TRY AGAIN",
     "unknownError": "This error occurs in 1 case out of 10 000!"
   }
